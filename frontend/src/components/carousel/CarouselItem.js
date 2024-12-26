@@ -3,6 +3,11 @@ import "./Carousel.scss";
 import { Link } from "react-router-dom";
 import { shortenText } from "../../utils";
 
+
+function removeHTMLTags(input) {
+  const regex = /<[^>]+>/g;
+  return input.replace(regex, "");
+}
 const CarouselItem = ({
   url,
   name,
@@ -11,6 +16,8 @@ const CarouselItem = ({
   description,
   product,
 }) => {
+    const desc = removeHTMLTags(description);
+
   return (
     <div className="carouselItem">
       <Link to="/product-details">
