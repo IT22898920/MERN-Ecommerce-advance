@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRoute = require("./routes/userRoute");
+const errorHandler = require("./middleware/errorMiddleware");
 
 
 const app = express();
@@ -30,7 +31,8 @@ app.use(
 app.use("/api/users", userRoute);
 
 
-
+// Error Middleware
+app.use(errorHandler);
 
 // Connect to DB and start server
 const PORT = process.env.PORT || 5000;

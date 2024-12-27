@@ -1,8 +1,74 @@
 const asyncHandler = require("express-async-handler");
+const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 
+// Generate Token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+};
+
+// Register User
 const registerUser = asyncHandler(async (req, res) => {
-    res.send("Register")
+  const { name, email, password } = req.body;
+  console.log(req.body);
+
+  // Validation
+  if (!name || !email || !password) {
+    res.status(400);
+    throw new Error("Please fill in all required fields");
+  }
+  if (password.length < 6) {
+    res.status(400);
+    throw new Error("Password must be up to 6 characters");
+  }
+
+  // Check if user email already exists
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    res.status(400);
+    throw new Error("Email has already been registered");
+  }
+
+  // Create stripe customer
+  // const customer = await stripe.customers.create({ email });
+
+  // Create new user
+  const user = await User.create({
+    name,
+    email,
+    password,
+    // stripeCustomerId: customer.id,
+  });
+
+  //   Generate Token
+  const token = generateToken(user._id);
+
+  if (user) {
+    const { _id, name, email, phone, role } = user;
+    // Send HTTP-only cookie
+    res.cookie("token", token, {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400), // 1 day
+      // sameSite: "none",
+      // secure: true,
+    });
+
+    res.status(201).json({
+      _id,
+      name,
+      email,
+      phone,
+      role,
+      token,
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
 })
 
 
