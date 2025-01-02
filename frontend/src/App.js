@@ -12,7 +12,8 @@ axios.defaults.withCredentials = true;
 // Deploy
 
 const App = () => {
-  
+  axios.defaults.withCredentials = true;
+
   return (
     <>
       <BrowserRouter>

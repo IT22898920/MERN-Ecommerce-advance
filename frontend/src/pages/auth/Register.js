@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./auth.module.scss";
 import registerImg from "../../assets/register.png";
 import Card from "../../components/card/Card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Loader from "../../components/loader/Loader";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { validateEmail } from "../../redux/features/auth/authService";
+import { RESET_AUTH, register } from "../../redux/features/auth/authSlice";
 
 const initialState = {
   name: "",
@@ -11,23 +15,62 @@ const initialState = {
   password: "",
   cPassword: "",
 };
+
 const Register = () => {
   const [formData, setFormData] = useState(initialState);
   const { name, email, password, cPassword } = formData;
 
-      const registerUser = async (e) => {
-            e.preventDefault();
+  const { isLoading, isLoggedIn, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-      }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-        const handleInputChange = (e) => {
-          const { name, value } = e.target;
-          setFormData({ ...formData, [name]: value });
-        };
+  const registerUser = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      return toast.error("All fields are required");
+    }
+    if (password.length < 6) {
+      return toast.error("Password must be up to 6 characters");
+    }
+    if (!validateEmail(email)) {
+      return toast.error("Please enter a valid email");
+    }
+    if (password !== cPassword) {
+      toast.error("Passwords do not match.");
+    }
+    const userData = {
+      name,
+      email,
+      password,
+    };
+
+    console.log(userData);
+    dispatch(register(userData));
+  };
+
+  useEffect(() => {
+    console.log(isLoggedIn, isSuccess);
+    if (isSuccess && isLoggedIn) {
+      navigate("/");
+    }
+
+     dispatch(RESET_AUTH());
+  }, [isLoggedIn, isSuccess]);
+
+  useEffect(() => {
+    dispatch(RESET_AUTH());
+  }, [dispatch]);
 
   return (
     <>
-      {/* {isLoading && <Loader />} */}
+      {isLoading && <Loader />}
       <section className={`container ${styles.auth}`}>
         <Card>
           <div className={styles.form}>

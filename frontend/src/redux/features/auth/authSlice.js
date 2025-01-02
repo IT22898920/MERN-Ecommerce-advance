@@ -29,6 +29,10 @@ export const register = createAsyncThunk(
   }
 );
 
+
+
+
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -52,7 +56,7 @@ const authSlice = createSlice({
             state.isLoggedIn = true;
             state.user = action.payload;
             toast.success("Registration Successful");
-            // console.log(action.payload);
+             console.log(action.payload);
           })
           .addCase(register.rejected, (state, action) => {
             state.isLoading = false;
@@ -64,6 +68,6 @@ const authSlice = createSlice({
     }
 });
 
-export const {} = authSlice.actions;
+export const { RESET_AUTH } = authSlice.actions;
 
 export default authSlice.reducer;
