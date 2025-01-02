@@ -25,8 +25,23 @@ const register = async (userData) => {
   }
 };
 
+// Login User
+const login = async (userData) => {
+  try {
+  const response = await axios.post(API_URL + "login", userData, {
+    withCredentials: true,
+  });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("login Error:", error.response?.data || error.message);
+    throw error.response?.data || error; // Rethrow the error for handling upstream
+  }
+};
+
 const authService = {
   register,
+  login,
 };
 
 export default authService;
