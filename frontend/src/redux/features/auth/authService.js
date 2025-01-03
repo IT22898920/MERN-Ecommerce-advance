@@ -1,8 +1,9 @@
 import axios from "axios";
 
 const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL 
+  process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 export const API_URL = `${BACKEND_URL}/api/users/`;
+
 
 // Validate email
 export const validateEmail = (email) => {
@@ -14,8 +15,9 @@ export const validateEmail = (email) => {
 // Register User
 const register = async (userData) => {
   try {
+    
     const response = await axios.post(API_URL + "register", userData, {
-      withCredentials: true,
+     // withCredentials: true,
     });
     console.log(response);
     return response.data;
