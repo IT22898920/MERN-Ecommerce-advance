@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Header.module.scss";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaShoppingCart, FaTimes, FaUserCircle } from "react-icons/fa";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
+import { RESET_AUTH, logout } from "../../redux/features/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export const logo = (
   <div className={styles.logo}>
@@ -18,16 +20,17 @@ const activeLink = ({ isActive }) => (isActive ? `${styles.active}` : "");
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [scrollPage, setScrollPage] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-
-    const fixNavbar = () => {
-      if (window.scrollY > 50) {
-        setScrollPage(true);
-      } else {
-        setScrollPage(false);
-      }
-    };
-      window.addEventListener("scroll", fixNavbar);
+  const fixNavbar = () => {
+    if (window.scrollY > 50) {
+      setScrollPage(true);
+    } else {
+      setScrollPage(false);
+    }
+  };
+  window.addEventListener("scroll", fixNavbar);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -36,15 +39,23 @@ const Header = () => {
   const hideMenu = () => {
     setShowMenu(false);
   };
-    const cart = (
-      <span className={styles.cart}>
-        <Link to="/cart">
-          Cart
-          <FaShoppingCart size={20} />
-          {/* <p>{cartTotalQuantity}</p> */}
-        </Link>
-      </span>
-    );
+  const logoutUser = async () => {
+    dispatch(RESET_AUTH());
+    await dispatch(logout());
+    localStorage.setItem("cartItems", JSON.stringify([]));
+    navigate("/login");
+    window.location.reload();
+  };
+
+  const cart = (
+    <span className={styles.cart}>
+      <Link to="/cart">
+        Cart
+        <FaShoppingCart size={20} />
+        {/* <p>{cartTotalQuantity}</p> */}
+      </Link>
+    </span>
+  );
   return (
     <header className={scrollPage ? `${styles.fixed}` : null}>
       <div className={styles.header}>
@@ -83,6 +94,9 @@ const Header = () => {
               </NavLink>
               <NavLink to="/order-history" className={activeLink}>
                 My Orders
+              </NavLink>
+              <NavLink to="/" onClick={logoutUser}>
+                Logout
               </NavLink>
             </span>
             {cart}
