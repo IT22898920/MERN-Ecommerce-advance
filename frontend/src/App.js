@@ -7,12 +7,22 @@ import Register from "./pages/auth/Register";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getLoginStatus } from "./redux/features/auth/authSlice";
 
 axios.defaults.withCredentials = true;
 // Deploy
 
 const App = () => {
-  axios.defaults.withCredentials = true;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getLoginStatus());
+     console.log("Get Login Status App");
+  }, [dispatch]);
+
+
 
   return (
     <>
