@@ -3,6 +3,16 @@ import "./Profile.scss";
 import PageMenu from "../../components/pageMenu/PageMenu";
 import { useDispatch, useSelector } from "react-redux";
 import Card from "../../components/card/Card";
+import { getUser, updatePhoto, updateUser } from "../../redux/features/auth/authSlice";
+import { toast } from "react-toastify";
+import Loader from "../../components/loader/Loader";
+import { AiOutlineCloudUpload } from "react-icons/ai";
+
+
+const cloud_name = process.env.REACT_APP_CLOUD_NAME;
+const upload_preset = process.env.REACT_APP_UPLOAD_PRESET;
+
+
 
 const Profile = () => {
   const { isLoading, isLoggedIn, isSuccess, message, user } = useSelector(
@@ -16,21 +26,110 @@ const Profile = () => {
     address: user?.address || {},
   };
   const [profile, setProfile] = useState(initialState);
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-    const saveProfile = async (e) => {
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (user === null) {
+      dispatch(getUser());
     }
+  }, [dispatch, user]);
+  console.log(user);
+  useEffect(() => {
+    if (user) {
+      setProfile({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        role: user.role || "",
+        address: user.address || {},
+      });
+    }
+  }, [user]);
+
+    const savePhoto = async (e) => {
+      e.preventDefault();
+      let imageURL;
+      try {
+        if (
+          profileImage !== null &&
+          (profileImage.type === "image/jpeg" ||
+            profileImage.type === "image/jpg" ||
+            profileImage.type === "image/png")
+        ) {
+          const image = new FormData();
+          image.append("file", profileImage);
+          image.append("cloud_name", cloud_name);
+          image.append("upload_preset", upload_preset);
+
+          // Save image to Cloudinary
+          const response = await fetch(
+            "https://api.cloudinary.com/v1_1/dqwgbpf2d/image/upload",
+            { method: "post", body: image }
+          );
+        const imgData = await response.json();
+          console.log(imgData);
+        imageURL = imgData.url.toString();
+        }
+
+        // Save photo to MongoDB
+        const userData = {
+          photo: profileImage ? imageURL : profile.photo,
+        };
+
+        if (profileImage && profileImage.type.includes("image")) {
+          // Proceed with upload
+        } else {
+          toast.error("Please select a valid image file (jpg, jpeg, png).");
+        }
+
+
+        dispatch(updatePhoto(userData));
+        setImagePreview(null);
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const userData = {
+        name: profile.name,
+        phone: profile.phone,
+        address: {
+          address: profile.address,
+          state: profile.state,
+          country: profile.country,
+        },
+      };
+      console.log(userData);
+
+      dispatch(updateUser(userData));
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  console.log(profile);  
+  
   const handleImageChange = (e) => {
-  }
+    setProfileImage(e.target.files[0]);
+    setImagePreview(URL.createObjectURL(e.target.files[0]));
+  };
 
   const handleInputChange = (e) => {
-  }
-
-
-
+    const { name, value } = e.target;
+    setProfile({ ...profile, [name]: value });
+  };
+console.log("Cloud name:", process.env.REACT_APP_CLOUD_NAME);
+console.log("Upload preset:", process.env.REACT_APP_UPLOAD_PRESET);
   return (
     <>
       <section>
+        {isLoading && <Loader />}
+
         <div className="container">
           <PageMenu />
           <h2>Profile</h2>
@@ -40,7 +139,22 @@ const Profile = () => {
                 <>
                   <div className="profile-photo">
                     <div>
-                      <h2>Profile Image</h2>
+                      <img
+                        src={imagePreview === null ? user?.photo : imagePreview}
+                        alt="Profileimg"
+                      />
+                      <h3>Role: {profile.role}</h3>
+                      {imagePreview !== null && (
+                        <div className="--center-all">
+                          <button
+                            className="--btn --btn-secondary"
+                            onClick={savePhoto}
+                          >
+                            <AiOutlineCloudUpload size={18} /> &nbsp; Upload
+                            Photo
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <form onSubmit={saveProfile}>
