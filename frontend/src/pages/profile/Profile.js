@@ -3,10 +3,11 @@ import "./Profile.scss";
 import PageMenu from "../../components/pageMenu/PageMenu";
 import { useDispatch, useSelector } from "react-redux";
 import Card from "../../components/card/Card";
-import { getUser, updatePhoto, updateUser } from "../../redux/features/auth/authSlice";
+import { getUser, selectUser, updatePhoto, updateUser } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
 import Loader from "../../components/loader/Loader";
 import { AiOutlineCloudUpload } from "react-icons/ai";
+import { shortenText } from "../../utils";
 
 
 const cloud_name = process.env.REACT_APP_CLOUD_NAME;
@@ -233,6 +234,16 @@ console.log("Upload preset:", process.env.REACT_APP_UPLOAD_PRESET);
         </div>
       </section>
     </>
+  );
+};
+
+export const UserName = () => {
+  const user = useSelector(selectUser);
+
+  const username = user?.name || "...";
+
+  return (
+    <span style={{ color: "#ff7722" }}>Hi, {shortenText(username, 9)} |</span>
   );
 };
 

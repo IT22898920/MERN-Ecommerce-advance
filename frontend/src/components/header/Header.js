@@ -6,6 +6,7 @@ import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { RESET_AUTH, logout } from "../../redux/features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ShowOnLogin, { ShowOnLogout } from "../hiddenLink/hiddenLink";
+import { UserName } from "../../pages/profile/Profile";
 
 export const logo = (
   <div className={styles.logo}>
@@ -90,7 +91,7 @@ const Header = () => {
               <ShowOnLogin>
                 <Link to="/profile">
                   <FaUserCircle size={16} color="#ff7722" />
-                  {/* <UserName /> */}
+                  <UserName />
                 </Link>
               </ShowOnLogin>
               <ShowOnLogout>
