@@ -119,10 +119,70 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 
+// Review Product
+const reviewProduct = asyncHandler(async (req, res) => {
+  // star, review
+  const { star, review, reviewDate } = req.body;
+  const { id } = req.params;
+
+  // validation
+  if (star < 1 || !review) {
+    res.status(400);
+    throw new Error("Please add star and review");
+  }
+
+  const product = await Product.findById(id);
+
+  // if product doesnt exist
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  // Update Product
+  product.ratings.push({
+    star,
+    review,
+    reviewDate,
+    name: req.user.name,
+    userID: req.user._id,
+  });
+  product.save();
+
+  res.status(200).json({ message: "Product review added." });
+});
+
+// Delete Product
+const deleteReview = asyncHandler(async (req, res) => {
+  const { userID } = req.body;
+
+  const product = await Product.findById(req.params.id);
+  // if product doesnt exist
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  const newRatings = product.ratings.filter((rating) => {
+    return rating.userID.toString() !== userID.toString();
+  });
+  console.log(newRatings);
+  product.ratings = newRatings;
+  product.save();
+  res.status(200).json({ message: "Product rating deleted!!!." });
+});
+
+
 module.exports = {
   createProduct,
   getProduct,
   getProducts,
   deleteProduct,
   updateProduct,
+  reviewProduct,
+  deleteReview,
 };
