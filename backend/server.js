@@ -5,6 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRoute = require("./routes/userRoute");
 const errorHandler = require("./middleware/errorMiddleware");
+const productRoute = require("./routes/productRoute");
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(
 
 // Routes Middleware
 app.use("/api/users", userRoute);
+app.use("/api/products", productRoute);
 
 
 // Error Middleware
