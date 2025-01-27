@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const userRoute = require("./routes/userRoute");
 const errorHandler = require("./middleware/errorMiddleware");
 const productRoute = require("./routes/productRoute");
+const categoryRoute = require("./routes/categoryRoute");
+const brandRoute = require("./routes/brandRoute");
 
 
 const app = express();
@@ -32,6 +34,8 @@ app.use(
 // Routes Middleware
 app.use("/api/users", userRoute);
 app.use("/api/products", productRoute);
+app.use("/api/category", categoryRoute);
+app.use("/api/brand", brandRoute);
 
 
 // Error Middleware
